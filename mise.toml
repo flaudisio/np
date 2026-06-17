@@ -1,0 +1,18 @@
+[tools]
+go = "1.26"
+golangci-lint = "2.5"
+shellcheck = "0.11"
+
+[tasks.pre-commit]
+description = "Run pre-commit"
+run = "pre-commit run --all-files --color always"
+
+[tasks.lint]
+description = "Run golangci-lint"
+alias = "l"
+run = "golangci-lint run ./..."
+
+[tasks.test]
+description = "Run tests"
+alias = "t"
+run = "go test ./..."
