@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -20,10 +21,10 @@ func TestCLIHelp(t *testing.T) {
 	if err != nil {
 		t.Fatalf("process exited: %v\n%s", err, out)
 	}
-	if !contains(string(out), "deploy") {
+	if !strings.Contains(string(out), "deploy") {
 		t.Errorf("expected deploy in help, got: %s", out)
 	}
-	if !contains(string(out), "plan") {
+	if !strings.Contains(string(out), "plan") {
 		t.Errorf("expected plan in help, got: %s", out)
 	}
 }
@@ -46,7 +47,9 @@ func TestCLIDeployMissingConfig(t *testing.T) {
 func TestCLIDeployWithConfig_DryRun(t *testing.T) {
 	if os.Getenv("TEST_CLI") == "1" {
 		dir := os.Getenv("TEST_DIR")
-		_ = os.Chdir(dir)
+		if err := os.Chdir(dir); err != nil {
+			t.Fatal(err)
+		}
 		os.Args = []string{"np", "deploy", "--dry-run"}
 		main()
 		return
@@ -57,7 +60,9 @@ func TestCLIDeployWithConfig_DryRun(t *testing.T) {
 pack:
   name: test-pack
 `
-	_ = os.WriteFile(filepath.Join(dir, "deploy.yaml"), []byte(yaml), 0o644)
+	if err := os.WriteFile(filepath.Join(dir, "deploy.yaml"), []byte(yaml), 0o644); err != nil {
+		t.Fatal(err)
+	}
 
 	cmd := exec.Command(os.Args[0], "-test.run=TestCLIDeployWithConfig_DryRun")
 	cmd.Env = append(os.Environ(), "TEST_CLI=1", "TEST_DIR="+dir)
@@ -65,19 +70,10 @@ pack:
 	if err != nil {
 		t.Fatalf("unexpected error: %v\n%s", err, out)
 	}
-	if !contains(string(out), "run complete") {
+	if !strings.Contains(string(out), "run complete") {
 		t.Errorf("expected run complete message, got: %s", out)
 	}
-	if !contains(string(out), "nomad-pack run test-pack") {
+	if !strings.Contains(string(out), "nomad-pack run test-pack") {
 		t.Errorf("expected nomad-pack command in output, got: %s", out)
 	}
-}
-
-func contains(s, substr string) bool {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return true
-		}
-	}
-	return false
 }

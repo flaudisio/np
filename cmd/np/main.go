@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -55,20 +56,17 @@ func planCmd() *cobra.Command {
 func run(action string) error {
 	cfg, err := config.Load(configPath)
 	if err != nil {
-		log.Error(err.Error())
-		os.Exit(1)
+		return err
 	}
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		log.Error(err.Error())
-		os.Exit(1)
+		return fmt.Errorf("getting working directory: %w", err)
 	}
 	log.Info("Running from " + cwd)
 
 	if err := nomadpack.Run(cfg, action, dryRun); err != nil {
-		log.Error(err.Error())
-		os.Exit(1)
+		return err
 	}
 
 	log.Success(action + " complete")
