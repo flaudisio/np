@@ -145,6 +145,21 @@ func TestBuildCommandPlanNotVerbose(t *testing.T) {
 	}
 }
 
+func TestBuildCommandWithExtraArgs(t *testing.T) {
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+		},
+	}
+
+	cmd := BuildCommand(cfg, "render", "--no-format", "--arg", "value")
+	expected := []string{
+		"nomad-pack", "render", "my-pack",
+		"--no-format", "--arg", "value",
+	}
+	assertSliceEqual(t, expected, cmd)
+}
+
 func TestEnsureRegistryAlreadyExists(t *testing.T) {
 	calls := [][]string{}
 	execCommand = func(name string, args ...string) *exec.Cmd {

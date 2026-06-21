@@ -14,7 +14,7 @@ import (
 
 var execCommand = exec.Command
 
-func BuildCommand(cfg *config.DeployConfig, action string) []string {
+func BuildCommand(cfg *config.DeployConfig, action string, extraArgs ...string) []string {
 	cmd := []string{"nomad-pack", action, cfg.Pack.Name}
 
 	if cfg.Deploy.Name != "" {
@@ -45,11 +45,13 @@ func BuildCommand(cfg *config.DeployConfig, action string) []string {
 		cmd = append(cmd, "--verbose")
 	}
 
+	cmd = append(cmd, extraArgs...)
+
 	return cmd
 }
 
-func Run(cfg *config.DeployConfig, action string, dryRun bool) error {
-	cmd := BuildCommand(cfg, action)
+func Run(cfg *config.DeployConfig, action string, dryRun bool, extraArgs ...string) error {
+	cmd := BuildCommand(cfg, action, extraArgs...)
 	log.Info(fmt.Sprintf("+ %s", strings.Join(cmd, " ")))
 
 	if dryRun {

@@ -42,7 +42,7 @@ func deployCmd() *cobra.Command {
 		Aliases: []string{"run"},
 		Short:   "Deploy a Nomad Pack from deploy.yml",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return run("run")
+			return run("run", args)
 		},
 	}
 }
@@ -52,7 +52,7 @@ func planCmd() *cobra.Command {
 		Use:   "plan",
 		Short: "Plan a Nomad Pack deployment from deploy.yml",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return run("plan")
+			return run("plan", args)
 		},
 	}
 }
@@ -62,7 +62,7 @@ func destroyCmd() *cobra.Command {
 		Use:   "destroy",
 		Short: "Destroy a Nomad Pack from deploy.yml",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return run("destroy")
+			return run("destroy", args)
 		},
 	}
 }
@@ -72,7 +72,7 @@ func stopCmd() *cobra.Command {
 		Use:   "stop",
 		Short: "Stop a Nomad Pack from deploy.yml",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return run("stop")
+			return run("stop", args)
 		},
 	}
 }
@@ -82,12 +82,12 @@ func renderCmd() *cobra.Command {
 		Use:   "render",
 		Short: "Render a Nomad Pack from deploy.yml",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return run("render")
+			return run("render", args)
 		},
 	}
 }
 
-func run(action string) error {
+func run(action string, extraArgs []string) error {
 	cfg, err := config.Load(configPath)
 	if err != nil {
 		return err
@@ -99,7 +99,7 @@ func run(action string) error {
 	}
 	log.Info("Running from " + cwd)
 
-	if err := nomadpack.Run(cfg, action, dryRun); err != nil {
+	if err := nomadpack.Run(cfg, action, dryRun, extraArgs...); err != nil {
 		return err
 	}
 

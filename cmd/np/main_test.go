@@ -146,6 +146,43 @@ pack:
 	}
 }
 
+func TestCLIRenderDryRunWithExtraArgs(t *testing.T) {
+	if os.Getenv("TEST_CLI") == "1" {
+		dir := os.Getenv("TEST_DIR")
+		if err := os.Chdir(dir); err != nil {
+			t.Fatal(err)
+		}
+		os.Args = []string{"np", "render", "--dry-run", "--", "--no-format", "--arg", "value"}
+		main()
+		return
+	}
+
+	dir := t.TempDir()
+	yaml := `
+pack:
+  name: test-pack
+`
+	if err := os.WriteFile(filepath.Join(dir, "deploy.yml"), []byte(yaml), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cmd := exec.Command(os.Args[0], "-test.run=TestCLIRenderDryRunWithExtraArgs")
+	cmd.Env = append(os.Environ(), "TEST_CLI=1", "TEST_DIR="+dir)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("unexpected error: %v\n%s", err, out)
+	}
+	if !strings.Contains(string(out), "nomad-pack render test-pack") {
+		t.Errorf("expected nomad-pack render command, got: %s", out)
+	}
+	if !strings.Contains(string(out), "--no-format") {
+		t.Errorf("expected --no-format in output, got: %s", out)
+	}
+	if !strings.Contains(string(out), "--arg value") {
+		t.Errorf("expected --arg value in output, got: %s", out)
+	}
+}
+
 func TestCLIDeployWithConfig_DryRun(t *testing.T) {
 	if os.Getenv("TEST_CLI") == "1" {
 		dir := os.Getenv("TEST_DIR")
