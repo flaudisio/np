@@ -35,8 +35,9 @@ func main() {
 
 func deployCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "deploy",
-		Short: "Deploy a Nomad Pack from deploy.yml",
+		Use:     "deploy",
+		Aliases: []string{"run"},
+		Short:   "Deploy a Nomad Pack from deploy.yml",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return run("run")
 		},
