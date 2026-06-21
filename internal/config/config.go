@@ -60,5 +60,9 @@ func Load(path string) (*DeployConfig, error) {
 		}
 	}
 
+	if !v.IsSet("deploy.var_files") {
+		cfg.Deploy.VarFiles = []string{"variables.hcl"}
+	}
+
 	return &cfg, nil
 }

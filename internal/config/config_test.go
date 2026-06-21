@@ -31,6 +31,10 @@ pack:
 	if cfg.Pack.Name != "my-pack" {
 		t.Errorf("expected my-pack, got %s", cfg.Pack.Name)
 	}
+	if len(cfg.Deploy.VarFiles) != 1 ||
+		cfg.Deploy.VarFiles[0] != "variables.hcl" {
+		t.Errorf("expected [variables.hcl], got %v", cfg.Deploy.VarFiles)
+	}
 }
 
 func TestLoadFull(t *testing.T) {
@@ -107,14 +111,33 @@ pack:
 	if len(cfg.Deploy.Vars) != 0 {
 		t.Errorf("expected empty vars, got %v", cfg.Deploy.Vars)
 	}
-	if len(cfg.Deploy.VarFiles) != 0 {
-		t.Errorf("expected empty var_files, got %v", cfg.Deploy.VarFiles)
+	if len(cfg.Deploy.VarFiles) != 1 ||
+		cfg.Deploy.VarFiles[0] != "variables.hcl" {
+		t.Errorf("expected [variables.hcl], got %v", cfg.Deploy.VarFiles)
 	}
 	if cfg.Plan.Verbose {
 		t.Error("expected verbose to be false by default")
 	}
 	if cfg.Pack.Registry != nil {
 		t.Error("expected registry to be nil by default")
+	}
+}
+
+func TestVarFilesExplicitEmpty(t *testing.T) {
+	yaml := `
+pack:
+  name: my-pack
+deploy:
+  var_files: []
+`
+	path := writeTempYAML(t, yaml)
+
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cfg.Deploy.VarFiles) != 0 {
+		t.Errorf("expected no var_files, got %v", cfg.Deploy.VarFiles)
 	}
 }
 
