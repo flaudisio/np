@@ -10,7 +10,12 @@ run = "pre-commit run --all-files --color always"
 [tasks.lint]
 description = "Run golangci-lint"
 alias = "l"
-run = "golangci-lint run ./..."
+run = "mise run pre-commit golangci-lint-full"
+
+[tasks.build]
+description = "Build the project"
+alias = "b"
+run = "go build -o np ./cmd/np"
 
 [tasks.test]
 description = "Run tests"

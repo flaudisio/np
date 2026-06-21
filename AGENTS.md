@@ -13,7 +13,7 @@ Go CLI that reads a YAML config (`deploy.yaml`) and produces `nomad-pack` comman
 ## Setup
 
 ```bash
-mise install          # go 1.26, golangci-lint, shellcheck
+mise install  # Project dependencies
 ```
 
 ## Run
@@ -24,23 +24,22 @@ go run ./cmd/np plan            # plans from deploy.yaml
 go run ./cmd/np plan --dry-run  # prints commands without executing
 ```
 
+## Lint
+
+```bash
+mise run lint
+```
+
 ## Build
 
 ```bash
-go build -o np ./cmd/np
+mise run build
 ```
 
 ## Test
 
 ```bash
-go test ./...
-```
-
-## Lint
-
-```bash
-golangci-lint run ./...
-pre-commit run --all-files
+mise run test
 ```
 
 ## Conventions
