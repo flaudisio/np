@@ -27,6 +27,8 @@ func main() {
 
 	rootCmd.AddCommand(deployCmd())
 	rootCmd.AddCommand(planCmd())
+	rootCmd.AddCommand(destroyCmd())
+	rootCmd.AddCommand(stopCmd())
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
@@ -50,6 +52,26 @@ func planCmd() *cobra.Command {
 		Short: "Plan a Nomad Pack deployment from deploy.yml",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return run("plan")
+		},
+	}
+}
+
+func destroyCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "destroy",
+		Short: "Destroy a Nomad Pack from deploy.yml",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return run("destroy")
+		},
+	}
+}
+
+func stopCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "stop",
+		Short: "Stop a Nomad Pack from deploy.yml",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return run("stop")
 		},
 	}
 }
