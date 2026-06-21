@@ -1,6 +1,7 @@
 package nomadpack
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -66,7 +67,16 @@ func Run(cfg *config.DeployConfig, action string, dryRun bool) error {
 	c.Stderr = os.Stderr
 	c.Stdin = os.Stdin
 
-	return c.Run()
+	if err := c.Run(); err != nil {
+		if action == "plan" {
+			var exitErr *exec.ExitError
+			if errors.As(err, &exitErr) && exitErr.ExitCode() == 1 {
+				return nil
+			}
+		}
+		return err
+	}
+	return nil
 }
 
 func SetExecCommand(fn func(name string, args ...string) *exec.Cmd) func(name string, args ...string) *exec.Cmd {
