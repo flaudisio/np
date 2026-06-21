@@ -12,4 +12,4 @@ go run ./cmd/np deploy
 
 ## License
 
-MIT
+[MIT](LICENSE)
