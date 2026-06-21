@@ -10,7 +10,7 @@ import (
 func writeTempYAML(t *testing.T, content string) string {
 	t.Helper()
 	dir := t.TempDir()
-	path := filepath.Join(dir, "deploy.yaml")
+	path := filepath.Join(dir, "deploy.yml")
 	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}

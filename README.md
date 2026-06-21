@@ -1,6 +1,6 @@
 # np
 
-CLI for deploying Nomad Pack applications from a `deploy.yaml` config file.
+CLI for deploying Nomad Pack applications from a `deploy.yml` config file.
 
 ## Quick Start
 

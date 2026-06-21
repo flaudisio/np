@@ -60,7 +60,7 @@ func TestCLIDeployWithConfig_DryRun(t *testing.T) {
 pack:
   name: test-pack
 `
-	if err := os.WriteFile(filepath.Join(dir, "deploy.yaml"), []byte(yaml), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "deploy.yml"), []byte(yaml), 0o644); err != nil {
 		t.Fatal(err)
 	}
 

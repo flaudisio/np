@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Go CLI that reads a YAML config (`deploy.yaml`) and produces `nomad-pack` commands.
+Go CLI that reads a YAML config (`deploy.yml`) and produces `nomad-pack` commands.
 
 ## Stack
 
@@ -19,8 +19,8 @@ mise install  # Project dependencies
 ## Run
 
 ```bash
-go run ./cmd/np deploy          # deploys from deploy.yaml
-go run ./cmd/np plan            # plans from deploy.yaml
+go run ./cmd/np deploy          # deploys from deploy.yml
+go run ./cmd/np plan            # plans from deploy.yml
 go run ./cmd/np plan --dry-run  # prints commands without executing
 ```
 

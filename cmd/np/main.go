@@ -19,11 +19,11 @@ var (
 func main() {
 	rootCmd := &cobra.Command{
 		Use:   "np",
-		Short: "CLI for deploying Nomad Pack applications from deploy.yaml",
+		Short: "CLI for deploying Nomad Pack applications from deploy.yml",
 	}
 
-	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "deploy.yaml", "Path to deploy.yaml")
-	rootCmd.PersistentFlags().BoolVar(&dryRun, "dry-run", false, "Print commands without executing")
+	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "deploy.yml", "Path to deploy.yml")
+	rootCmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "n", false, "Print commands without executing")
 
 	rootCmd.AddCommand(deployCmd())
 	rootCmd.AddCommand(planCmd())
@@ -36,7 +36,7 @@ func main() {
 func deployCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "deploy",
-		Short: "Deploy a Nomad Pack from deploy.yaml",
+		Short: "Deploy a Nomad Pack from deploy.yml",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return run("run")
 		},
@@ -46,7 +46,7 @@ func deployCmd() *cobra.Command {
 func planCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "plan",
-		Short: "Plan a Nomad Pack deployment from deploy.yaml",
+		Short: "Plan a Nomad Pack deployment from deploy.yml",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return run("plan")
 		},
