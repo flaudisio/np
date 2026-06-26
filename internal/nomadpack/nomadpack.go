@@ -70,9 +70,12 @@ func Run(cfg *config.DeployConfig, action string, dryRun bool, extraArgs ...stri
 	c.Stdin = os.Stdin
 
 	if err := c.Run(); err != nil {
-		if action == "plan" {
-			var exitErr *exec.ExitError
-			if errors.As(err, &exitErr) && exitErr.ExitCode() == 1 {
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			if action == "plan" && exitErr.ExitCode() == 1 {
+				return nil
+			}
+			if action == "run" && exitErr.ExitCode() == 2 {
 				return nil
 			}
 		}
