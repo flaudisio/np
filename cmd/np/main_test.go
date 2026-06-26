@@ -50,7 +50,7 @@ func TestCLIDestroyDryRun(t *testing.T) {
 		if err := os.Chdir(dir); err != nil {
 			t.Fatal(err)
 		}
-		os.Args = []string{"np", "destroy", "--dry-run", "--debug"}
+		os.Args = []string{"np", "destroy", "--dry-run"}
 		main()
 		return
 	}
@@ -84,7 +84,7 @@ func TestCLIStopDryRun(t *testing.T) {
 		if err := os.Chdir(dir); err != nil {
 			t.Fatal(err)
 		}
-		os.Args = []string{"np", "stop", "--dry-run", "--debug"}
+		os.Args = []string{"np", "stop", "--dry-run"}
 		main()
 		return
 	}
@@ -118,7 +118,7 @@ func TestCLIRenderDryRun(t *testing.T) {
 		if err := os.Chdir(dir); err != nil {
 			t.Fatal(err)
 		}
-		os.Args = []string{"np", "render", "--dry-run", "--debug"}
+		os.Args = []string{"np", "render", "--dry-run"}
 		main()
 		return
 	}
@@ -189,7 +189,7 @@ func TestCLIDeployWithConfig_DryRun(t *testing.T) {
 		if err := os.Chdir(dir); err != nil {
 			t.Fatal(err)
 		}
-		os.Args = []string{"np", "deploy", "--dry-run", "--debug"}
+		os.Args = []string{"np", "deploy", "--dry-run"}
 		main()
 		return
 	}

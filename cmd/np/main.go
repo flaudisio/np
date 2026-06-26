@@ -24,7 +24,6 @@ func main() {
 
 	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "deploy.yml", "Path to deploy.yml")
 	rootCmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "n", false, "Print commands without executing")
-	rootCmd.PersistentFlags().BoolVarP(&log.DebugEnabled, "debug", "v", false, "Enable debug output")
 
 	rootCmd.AddCommand(deployCmd())
 	rootCmd.AddCommand(planCmd())
@@ -104,6 +103,6 @@ func run(action string, extraArgs []string) error {
 		return err
 	}
 
-	log.Debug(action + " complete")
+	log.Info(action + " complete")
 	return nil
 }
