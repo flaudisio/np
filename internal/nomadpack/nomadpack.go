@@ -1,3 +1,4 @@
+// Package nomadpack builds and executes nomad-pack CLI commands.
 package nomadpack
 
 import (
@@ -14,6 +15,11 @@ import (
 
 var execCommand = exec.Command
 
+// BuildCommand builds a nomad-pack argument slice from [config.DeployConfig].
+// Returns the full command line as []string suitable for exec.Command.
+//
+// Arguments are appended in this order: action, pack name, name, sorted vars,
+// sorted var files, optional registry flags, --verbose (plan only), extraArgs.
 func BuildCommand(cfg *config.DeployConfig, action string, extraArgs ...string) []string {
 	cmd := []string{"nomad-pack", action, cfg.Pack.Name}
 
@@ -50,6 +56,12 @@ func BuildCommand(cfg *config.DeployConfig, action string, extraArgs ...string) 
 	return cmd
 }
 
+// Run builds and executes the nomad-pack command.
+// If dryRun is true, only the command is logged and nil is returned.
+// Before running, the registry (if configured) is registered via ensureRegistry.
+//
+// Plan exit code 1 (non-empty plan) and run exit code 2 are treated as
+// success — returned as nil error.
 func Run(cfg *config.DeployConfig, action string, dryRun bool, extraArgs ...string) error {
 	cmd := BuildCommand(cfg, action, extraArgs...)
 	log.Info(fmt.Sprintf("+ %s", strings.Join(cmd, " ")))
@@ -84,12 +96,16 @@ func Run(cfg *config.DeployConfig, action string, dryRun bool, extraArgs ...stri
 	return nil
 }
 
+// SetExecCommand replaces the function used to create exec.Cmd instances.
+// Intended for tests. Returns the previous function for restoration.
 func SetExecCommand(fn func(name string, args ...string) *exec.Cmd) func(name string, args ...string) *exec.Cmd {
 	old := execCommand
 	execCommand = fn
 	return old
 }
 
+// ensureRegistry lists existing registries and adds the configured one
+// if it is not already present.
 func ensureRegistry(reg *config.RegistryConfig) error {
 	out, err := execCommand("nomad-pack", "registry", "list").Output()
 	if err != nil {

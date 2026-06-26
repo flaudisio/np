@@ -36,6 +36,7 @@ func main() {
 	}
 }
 
+// deployCmd returns the "deploy" (aliased as "run") subcommand.
 func deployCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "deploy",
@@ -47,6 +48,7 @@ func deployCmd() *cobra.Command {
 	}
 }
 
+// planCmd returns the "plan" subcommand.
 func planCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "plan",
@@ -57,6 +59,7 @@ func planCmd() *cobra.Command {
 	}
 }
 
+// destroyCmd returns the "destroy" subcommand.
 func destroyCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "destroy",
@@ -67,6 +70,7 @@ func destroyCmd() *cobra.Command {
 	}
 }
 
+// stopCmd returns the "stop" subcommand.
 func stopCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "stop",
@@ -77,6 +81,7 @@ func stopCmd() *cobra.Command {
 	}
 }
 
+// renderCmd returns the "render" subcommand.
 func renderCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "render",
@@ -87,6 +92,7 @@ func renderCmd() *cobra.Command {
 	}
 }
 
+// run loads the config, then builds and executes the nomad-pack action.
 func run(action string, extraArgs []string) error {
 	cfg, err := config.Load(configPath)
 	if err != nil {
