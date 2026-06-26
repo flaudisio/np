@@ -28,6 +28,34 @@ func captureStderr(t *testing.T, fn func()) string {
 	return buf.String()
 }
 
+func TestDebugEnabled(t *testing.T) {
+	DebugEnabled = true
+	defer func() { DebugEnabled = false }()
+
+	out := captureStderr(t, func() {
+		Debug("debug message")
+	})
+
+	if !strings.Contains(out, "DEBUG:") {
+		t.Errorf("expected DEBUG prefix, got: %s", out)
+	}
+	if !strings.Contains(out, "debug message") {
+		t.Errorf("expected debug message, got: %s", out)
+	}
+}
+
+func TestDebugDisabled(t *testing.T) {
+	DebugEnabled = false
+
+	out := captureStderr(t, func() {
+		Debug("debug message")
+	})
+
+	if out != "" {
+		t.Errorf("expected no output when debug disabled, got: %s", out)
+	}
+}
+
 func TestInfo(t *testing.T) {
 	out := captureStderr(t, func() {
 		Info("hello")

@@ -11,8 +11,18 @@ const (
 	colorGreen  = "\033[32m"
 	colorYellow = "\033[33m"
 	colorBlue   = "\033[34m"
+	colorCyan   = "\033[36m"
 	bold        = "\033[1m"
 )
+
+var DebugEnabled bool
+
+func Debug(msg string) {
+	if !DebugEnabled {
+		return
+	}
+	fmt.Fprintf(os.Stderr, "%s%sDEBUG:%s %s\n", bold, colorCyan, colorReset, msg)
+}
 
 func Info(msg string) {
 	fmt.Fprintf(os.Stderr, "%s%sINFO:%s %s\n", bold, colorBlue, colorReset, msg)
