@@ -14,16 +14,26 @@ import (
 var (
 	configPath string
 	dryRun     bool
+	cdDir      string
 )
 
 func main() {
 	rootCmd := &cobra.Command{
 		Use:   "np",
 		Short: "CLI for deploying Nomad Pack applications from deploy.yml",
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if cdDir != "" {
+				if err := os.Chdir(cdDir); err != nil {
+					return fmt.Errorf("changing directory to %s: %w", cdDir, err)
+				}
+			}
+			return nil
+		},
 	}
 
 	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "deploy.yml", "Path to deploy.yml")
 	rootCmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "n", false, "Print commands without executing")
+	rootCmd.PersistentFlags().StringVarP(&cdDir, "cd", "C", "", "Change to directory before running commands")
 
 	rootCmd.AddCommand(deployCmd())
 	rootCmd.AddCommand(planCmd())
