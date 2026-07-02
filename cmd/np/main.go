@@ -106,8 +106,9 @@ func renderCmd() *cobra.Command {
 // registryCmd returns the "registry" subcommand group.
 func registryCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "registry",
-		Short: "Manage Nomad Pack registries from deploy.yml",
+		Use:     "registry",
+		Aliases: []string{"reg"},
+		Short:   "Manage Nomad Pack registries from deploy.yml",
 	}
 	cmd.AddCommand(registryAddCmd())
 	cmd.AddCommand(registryDeleteCmd())
