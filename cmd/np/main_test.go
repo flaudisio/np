@@ -216,3 +216,153 @@ pack:
 		t.Errorf("expected nomad-pack command in output, got: %s", out)
 	}
 }
+
+func TestCLIRegistryAddDryRun(t *testing.T) {
+	if os.Getenv("TEST_CLI") == "1" {
+		dir := os.Getenv("TEST_DIR")
+		if err := os.Chdir(dir); err != nil {
+			t.Fatal(err)
+		}
+		os.Args = []string{"np", "registry", "add", "--dry-run"}
+		main()
+		return
+	}
+
+	dir := t.TempDir()
+	yaml := `
+pack:
+  name: test-pack
+  registry:
+    name: community
+    source: https://example.com/registry
+    ref: v0.1.0
+`
+	if err := os.WriteFile(filepath.Join(dir, "deploy.yml"), []byte(yaml), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cmd := exec.Command(os.Args[0], "-test.run=TestCLIRegistryAddDryRun")
+	cmd.Env = append(os.Environ(), "TEST_CLI=1", "TEST_DIR="+dir)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("unexpected error: %v\n%s", err, out)
+	}
+	if !strings.Contains(string(out), "nomad-pack registry add community https://example.com/registry --ref v0.1.0") {
+		t.Errorf("expected full registry add command in output, got: %s", out)
+	}
+}
+
+func TestCLIRegistryDeleteDryRun(t *testing.T) {
+	if os.Getenv("TEST_CLI") == "1" {
+		dir := os.Getenv("TEST_DIR")
+		if err := os.Chdir(dir); err != nil {
+			t.Fatal(err)
+		}
+		os.Args = []string{"np", "registry", "delete", "--dry-run"}
+		main()
+		return
+	}
+
+	dir := t.TempDir()
+	yaml := `
+pack:
+  name: test-pack
+  registry:
+    name: community
+    source: https://example.com/registry
+`
+	if err := os.WriteFile(filepath.Join(dir, "deploy.yml"), []byte(yaml), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cmd := exec.Command(os.Args[0], "-test.run=TestCLIRegistryDeleteDryRun")
+	cmd.Env = append(os.Environ(), "TEST_CLI=1", "TEST_DIR="+dir)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("unexpected error: %v\n%s", err, out)
+	}
+	if !strings.Contains(string(out), "nomad-pack registry delete community") {
+		t.Errorf("expected registry delete command in output, got: %s", out)
+	}
+}
+
+func TestCLIRegistryUpdateDryRun(t *testing.T) {
+	if os.Getenv("TEST_CLI") == "1" {
+		dir := os.Getenv("TEST_DIR")
+		if err := os.Chdir(dir); err != nil {
+			t.Fatal(err)
+		}
+		os.Args = []string{"np", "registry", "update", "--dry-run"}
+		main()
+		return
+	}
+
+	dir := t.TempDir()
+	yaml := `
+pack:
+  name: test-pack
+  registry:
+    name: community
+    source: https://example.com/registry
+    ref: v0.2.0
+`
+	if err := os.WriteFile(filepath.Join(dir, "deploy.yml"), []byte(yaml), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cmd := exec.Command(os.Args[0], "-test.run=TestCLIRegistryUpdateDryRun")
+	cmd.Env = append(os.Environ(), "TEST_CLI=1", "TEST_DIR="+dir)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("unexpected error: %v\n%s", err, out)
+	}
+	if !strings.Contains(string(out), "nomad-pack registry update community --ref v0.2.0") {
+		t.Errorf("expected full registry update command in output, got: %s", out)
+	}
+}
+
+func TestCLIRegistryAddMissingConfig(t *testing.T) {
+	if os.Getenv("TEST_CLI") == "1" {
+		os.Args = []string{"np", "registry", "add", "--config", "/nonexistent/path.yaml"}
+		main()
+		return
+	}
+
+	cmd := exec.Command(os.Args[0], "-test.run=TestCLIRegistryAddMissingConfig")
+	cmd.Env = append(os.Environ(), "TEST_CLI=1")
+	err := cmd.Run()
+	if err == nil {
+		t.Fatal("expected non-zero exit for missing config")
+	}
+}
+
+func TestCLIRegistryAddNoRegistry(t *testing.T) {
+	if os.Getenv("TEST_CLI") == "1" {
+		dir := os.Getenv("TEST_DIR")
+		if err := os.Chdir(dir); err != nil {
+			t.Fatal(err)
+		}
+		os.Args = []string{"np", "registry", "add", "--dry-run"}
+		main()
+		return
+	}
+
+	dir := t.TempDir()
+	yaml := `
+pack:
+  name: test-pack
+`
+	if err := os.WriteFile(filepath.Join(dir, "deploy.yml"), []byte(yaml), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cmd := exec.Command(os.Args[0], "-test.run=TestCLIRegistryAddNoRegistry")
+	cmd.Env = append(os.Environ(), "TEST_CLI=1", "TEST_DIR="+dir)
+	out, err := cmd.CombinedOutput()
+	if err == nil {
+		t.Fatal("expected non-zero exit for missing registry")
+	}
+	if !strings.Contains(string(out), "no registry configured") {
+		t.Errorf("expected 'no registry configured' error, got: %s", out)
+	}
+}

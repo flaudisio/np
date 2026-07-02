@@ -40,6 +40,7 @@ func main() {
 	rootCmd.AddCommand(destroyCmd())
 	rootCmd.AddCommand(stopCmd())
 	rootCmd.AddCommand(renderCmd())
+	rootCmd.AddCommand(registryCmd())
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
@@ -98,6 +99,63 @@ func renderCmd() *cobra.Command {
 		Short: "Render a Nomad Pack from deploy.yml",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return run("render", args)
+		},
+	}
+}
+
+// registryCmd returns the "registry" subcommand group.
+func registryCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "registry",
+		Short: "Manage Nomad Pack registries from deploy.yml",
+	}
+	cmd.AddCommand(registryAddCmd())
+	cmd.AddCommand(registryDeleteCmd())
+	cmd.AddCommand(registryUpdateCmd())
+	return cmd
+}
+
+// registryAddCmd returns the "add" subcommand.
+func registryAddCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "add",
+		Short: "Add the configured registry from deploy.yml",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load(configPath)
+			if err != nil {
+				return err
+			}
+			return nomadpack.RegistryAdd(cfg, dryRun)
+		},
+	}
+}
+
+// registryDeleteCmd returns the "delete" subcommand.
+func registryDeleteCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "delete",
+		Short: "Delete the configured registry from deploy.yml",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load(configPath)
+			if err != nil {
+				return err
+			}
+			return nomadpack.RegistryDelete(cfg, dryRun)
+		},
+	}
+}
+
+// registryUpdateCmd returns the "update" subcommand.
+func registryUpdateCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "update",
+		Short: "Update the configured registry from deploy.yml",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load(configPath)
+			if err != nil {
+				return err
+			}
+			return nomadpack.RegistryUpdate(cfg, dryRun)
 		},
 	}
 }
