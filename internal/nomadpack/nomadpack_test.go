@@ -283,6 +283,288 @@ func TestRunDryRun(t *testing.T) {
 	}
 }
 
+func TestRegistryAdd(t *testing.T) {
+	calls := [][]string{}
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		calls = append(calls, append([]string{name}, args...))
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+			Registry: &config.RegistryConfig{
+				Name:   "community",
+				Source: "https://example.com/registry",
+				Ref:    "v0.1.0",
+			},
+		},
+	}
+
+	err := RegistryAdd(cfg, false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expected := []string{"nomad-pack", "registry", "add", "community", "https://example.com/registry", "--ref", "v0.1.0"}
+	assertSliceEqual(t, expected, calls[0])
+}
+
+func TestRegistryAddNoRef(t *testing.T) {
+	calls := [][]string{}
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		calls = append(calls, append([]string{name}, args...))
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+			Registry: &config.RegistryConfig{
+				Name:   "community",
+				Source: "https://example.com/registry",
+			},
+		},
+	}
+
+	err := RegistryAdd(cfg, false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expected := []string{"nomad-pack", "registry", "add", "community", "https://example.com/registry"}
+	assertSliceEqual(t, expected, calls[0])
+}
+
+func TestRegistryAddDryRun(t *testing.T) {
+	callCount := 0
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		callCount++
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+			Registry: &config.RegistryConfig{
+				Name:   "community",
+				Source: "https://example.com/registry",
+			},
+		},
+	}
+
+	err := RegistryAdd(cfg, true)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if callCount != 0 {
+		t.Errorf("expected 0 exec calls, got %d", callCount)
+	}
+}
+
+func TestRegistryAddNoRegistry(t *testing.T) {
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+		},
+	}
+
+	err := RegistryAdd(cfg, false)
+	if err == nil {
+		t.Fatal("expected error for missing registry config")
+	}
+	if err.Error() != "no registry configured in deploy.yml" {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestRegistryDelete(t *testing.T) {
+	calls := [][]string{}
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		calls = append(calls, append([]string{name}, args...))
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+			Registry: &config.RegistryConfig{
+				Name: "community",
+			},
+		},
+	}
+
+	err := RegistryDelete(cfg, false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expected := []string{"nomad-pack", "registry", "delete", "community"}
+	assertSliceEqual(t, expected, calls[0])
+}
+
+func TestRegistryDeleteWithRef(t *testing.T) {
+	calls := [][]string{}
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		calls = append(calls, append([]string{name}, args...))
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+			Registry: &config.RegistryConfig{
+				Name: "community",
+				Ref:  "v0.1.0",
+			},
+		},
+	}
+
+	err := RegistryDelete(cfg, false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expected := []string{"nomad-pack", "registry", "delete", "community", "--ref", "v0.1.0"}
+	assertSliceEqual(t, expected, calls[0])
+}
+
+func TestRegistryDeleteDryRun(t *testing.T) {
+	callCount := 0
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		callCount++
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+			Registry: &config.RegistryConfig{
+				Name: "community",
+			},
+		},
+	}
+
+	err := RegistryDelete(cfg, true)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if callCount != 0 {
+		t.Errorf("expected 0 exec calls, got %d", callCount)
+	}
+}
+
+func TestRegistryDeleteNoRegistry(t *testing.T) {
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+		},
+	}
+
+	err := RegistryDelete(cfg, false)
+	if err == nil {
+		t.Fatal("expected error for missing registry config")
+	}
+	if err.Error() != "no registry configured in deploy.yml" {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestRegistryUpdate(t *testing.T) {
+	calls := [][]string{}
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		calls = append(calls, append([]string{name}, args...))
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+			Registry: &config.RegistryConfig{
+				Name: "community",
+				Ref:  "v0.2.0",
+			},
+		},
+	}
+
+	err := RegistryUpdate(cfg, false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expected := []string{"nomad-pack", "registry", "update", "community", "--ref", "v0.2.0"}
+	assertSliceEqual(t, expected, calls[0])
+}
+
+func TestRegistryUpdateNoRef(t *testing.T) {
+	calls := [][]string{}
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		calls = append(calls, append([]string{name}, args...))
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+			Registry: &config.RegistryConfig{
+				Name: "community",
+			},
+		},
+	}
+
+	err := RegistryUpdate(cfg, false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expected := []string{"nomad-pack", "registry", "update", "community"}
+	assertSliceEqual(t, expected, calls[0])
+}
+
+func TestRegistryUpdateDryRun(t *testing.T) {
+	callCount := 0
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		callCount++
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+			Registry: &config.RegistryConfig{
+				Name: "community",
+			},
+		},
+	}
+
+	err := RegistryUpdate(cfg, true)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if callCount != 0 {
+		t.Errorf("expected 0 exec calls, got %d", callCount)
+	}
+}
+
+func TestRegistryUpdateNoRegistry(t *testing.T) {
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+		},
+	}
+
+	err := RegistryUpdate(cfg, false)
+	if err == nil {
+		t.Fatal("expected error for missing registry config")
+	}
+	if err.Error() != "no registry configured in deploy.yml" {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
 func assertSliceEqual(t *testing.T, expected, actual []string) {
 	t.Helper()
 	if len(expected) != len(actual) {

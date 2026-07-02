@@ -96,6 +96,63 @@ func Run(cfg *config.DeployConfig, action string, dryRun bool, extraArgs ...stri
 	return nil
 }
 
+// RegistryAdd runs nomad-pack registry add using the configured registry.
+func RegistryAdd(cfg *config.DeployConfig, dryRun bool) error {
+	if cfg.Pack.Registry == nil {
+		return errors.New("no registry configured in deploy.yml")
+	}
+	args := []string{"registry", "add", cfg.Pack.Registry.Name, cfg.Pack.Registry.Source}
+	if cfg.Pack.Registry.Ref != "" {
+		args = append(args, "--ref", cfg.Pack.Registry.Ref)
+	}
+	log.Info("+ nomad-pack " + strings.Join(args, " "))
+	if dryRun {
+		return nil
+	}
+	c := execCommand("nomad-pack", args...)
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	return c.Run()
+}
+
+// RegistryDelete runs nomad-pack registry delete using the configured registry.
+func RegistryDelete(cfg *config.DeployConfig, dryRun bool) error {
+	if cfg.Pack.Registry == nil {
+		return errors.New("no registry configured in deploy.yml")
+	}
+	args := []string{"registry", "delete", cfg.Pack.Registry.Name}
+	if cfg.Pack.Registry.Ref != "" {
+		args = append(args, "--ref", cfg.Pack.Registry.Ref)
+	}
+	log.Info("+ nomad-pack " + strings.Join(args, " "))
+	if dryRun {
+		return nil
+	}
+	c := execCommand("nomad-pack", args...)
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	return c.Run()
+}
+
+// RegistryUpdate runs nomad-pack registry update using the configured registry.
+func RegistryUpdate(cfg *config.DeployConfig, dryRun bool) error {
+	if cfg.Pack.Registry == nil {
+		return errors.New("no registry configured in deploy.yml")
+	}
+	args := []string{"registry", "update", cfg.Pack.Registry.Name}
+	if cfg.Pack.Registry.Ref != "" {
+		args = append(args, "--ref", cfg.Pack.Registry.Ref)
+	}
+	log.Info("+ nomad-pack " + strings.Join(args, " "))
+	if dryRun {
+		return nil
+	}
+	c := execCommand("nomad-pack", args...)
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	return c.Run()
+}
+
 // SetExecCommand replaces the function used to create exec.Cmd instances.
 // Intended for tests. Returns the previous function for restoration.
 func SetExecCommand(fn func(name string, args ...string) *exec.Cmd) func(name string, args ...string) *exec.Cmd {
