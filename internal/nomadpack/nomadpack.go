@@ -101,6 +101,12 @@ func RegistryAdd(cfg *config.DeployConfig, dryRun bool) error {
 	if cfg.Pack.Registry == nil {
 		return errors.New("no registry configured in deploy.yml")
 	}
+	if cfg.Pack.Registry.Name == "" {
+		return errors.New("registry name is required in deploy.yml")
+	}
+	if cfg.Pack.Registry.Source == "" {
+		return errors.New("registry source is required in deploy.yml")
+	}
 	args := []string{"registry", "add", cfg.Pack.Registry.Name, cfg.Pack.Registry.Source}
 	if cfg.Pack.Registry.Ref != "" {
 		args = append(args, "--ref", cfg.Pack.Registry.Ref)
@@ -120,6 +126,9 @@ func RegistryDelete(cfg *config.DeployConfig, dryRun bool) error {
 	if cfg.Pack.Registry == nil {
 		return errors.New("no registry configured in deploy.yml")
 	}
+	if cfg.Pack.Registry.Name == "" {
+		return errors.New("registry name is required in deploy.yml")
+	}
 	args := []string{"registry", "delete", cfg.Pack.Registry.Name}
 	if cfg.Pack.Registry.Ref != "" {
 		args = append(args, "--ref", cfg.Pack.Registry.Ref)
@@ -138,6 +147,9 @@ func RegistryDelete(cfg *config.DeployConfig, dryRun bool) error {
 func RegistryUpdate(cfg *config.DeployConfig, dryRun bool) error {
 	if cfg.Pack.Registry == nil {
 		return errors.New("no registry configured in deploy.yml")
+	}
+	if cfg.Pack.Registry.Name == "" {
+		return errors.New("registry name is required in deploy.yml")
 	}
 	args := []string{"registry", "update", cfg.Pack.Registry.Name}
 	if cfg.Pack.Registry.Ref != "" {

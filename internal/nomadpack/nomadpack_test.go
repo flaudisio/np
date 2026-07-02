@@ -565,6 +565,70 @@ func TestRegistryUpdateNoRegistry(t *testing.T) {
 	}
 }
 
+func TestRegistryAddExecFailure(t *testing.T) {
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		return exec.Command("false")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+			Registry: &config.RegistryConfig{
+				Name:   "community",
+				Source: "https://example.com/registry",
+			},
+		},
+	}
+
+	err := RegistryAdd(cfg, false)
+	if err == nil {
+		t.Fatal("expected error from exec failure")
+	}
+}
+
+func TestRegistryDeleteExecFailure(t *testing.T) {
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		return exec.Command("false")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+			Registry: &config.RegistryConfig{
+				Name: "community",
+			},
+		},
+	}
+
+	err := RegistryDelete(cfg, false)
+	if err == nil {
+		t.Fatal("expected error from exec failure")
+	}
+}
+
+func TestRegistryUpdateExecFailure(t *testing.T) {
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		return exec.Command("false")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{
+			Name: "my-pack",
+			Registry: &config.RegistryConfig{
+				Name: "community",
+			},
+		},
+	}
+
+	err := RegistryUpdate(cfg, false)
+	if err == nil {
+		t.Fatal("expected error from exec failure")
+	}
+}
+
 func assertSliceEqual(t *testing.T, expected, actual []string) {
 	t.Helper()
 	if len(expected) != len(actual) {
