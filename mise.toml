@@ -1,7 +1,9 @@
 [tools]
 go = "1.26"
 golangci-lint = "2.5"
+nomad-pack = "0.4"
 shellcheck = "0.11"
+nomad = "2"
 
 [tasks.pre-commit]
 description = "Run pre-commit"
