@@ -2,7 +2,8 @@
 version: 2
 
 builds:
-  - env:
+  - main: ./cmd/np
+    env:
       - CGO_ENABLED=0
     ldflags:
       - -X main.version={{.Version}}
