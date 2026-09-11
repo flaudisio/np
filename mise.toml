@@ -41,7 +41,7 @@ run = "mise run pre-commit golangci-lint-full"
 [tasks.build]
 description = "Build the project"
 alias = "b"
-run = "go build -o np ./cmd/np"
+run = 'go build -o np -ldflags "-X main.version=$( git describe --tags --always --dirty )" ./cmd/np'
 
 [tasks.test]
 description = "Run tests"
