@@ -42,6 +42,11 @@ mise run build
 mise run test
 ```
 
+## Releasing
+
+Tag a commit `v*` (e.g. `git tag v1.0.0 && git push origin v1.0.0`); GoReleaser builds
+linux/darwin × amd64/arm64 binaries and publishes them to a GitHub release.
+
 ## Conventions
 
 - Go standard formatting (gofmt / goimports)

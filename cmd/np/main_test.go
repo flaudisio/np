@@ -29,6 +29,24 @@ func TestCLIHelp(t *testing.T) {
 	}
 }
 
+func TestCLIVersion(t *testing.T) {
+	if os.Getenv("TEST_CLI") == "1" {
+		os.Args = []string{"np", "--version"}
+		main()
+		return
+	}
+
+	cmd := exec.Command(os.Args[0], "-test.run=TestCLIVersion")
+	cmd.Env = append(os.Environ(), "TEST_CLI=1")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("process exited: %v\n%s", err, out)
+	}
+	if !strings.Contains(string(out), "np version") {
+		t.Errorf("expected version output, got: %s", out)
+	}
+}
+
 func TestCLIDeployMissingConfig(t *testing.T) {
 	if os.Getenv("TEST_CLI") == "1" {
 		os.Args = []string{"np", "deploy", "--config", "/nonexistent/path.yaml"}

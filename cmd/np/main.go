@@ -15,12 +15,14 @@ var (
 	configPath string
 	dryRun     bool
 	cdDir      string
+	version    = "dev"
 )
 
 func main() {
 	rootCmd := &cobra.Command{
-		Use:   "np",
-		Short: "CLI for deploying Nomad Pack applications from deploy.yml",
+		Use:     "np",
+		Short:   "CLI for deploying Nomad Pack applications from deploy.yml",
+		Version: version,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if cdDir != "" {
 				if err := os.Chdir(cdDir); err != nil {

@@ -1,0 +1,55 @@
+# git-cliff ~ configuration file
+# https://git-cliff.org/docs/configuration
+[changelog]
+header = """
+  # Changelog
+
+  ## Unreleased
+"""
+body = """
+  {% if version %}
+  ## {{ version }} - {{ timestamp | date(format="%Y-%m-%d", timezone="America/Sao_Paulo") }}
+  {% endif -%}
+  {% for group, commits in commits | group_by(attribute="group") %}
+  ### {{ group | striptags | trim | upper_first }}
+
+  {% for commit in commits -%}
+  - {% if commit.breaking %}[**breaking**] {% endif %}{% if commit.scope %}[{{ commit.scope }}] {% endif %}{{ commit.message | upper_first }}
+  {% endfor -%}
+  {% endfor -%}
+"""
+trim = true
+render_always = true
+
+[git]
+# Ref: https://www.conventionalcommits.org
+conventional_commits = true
+filter_unconventional = false
+require_conventional = false
+sort_commits = "newest"
+split_commits = false
+commit_parsers = [
+  # Note: HTML comments define the group positions
+  { message = "^feat", group = "<!-- 0 --> Features" },
+  { message = "^fix", group = "<!-- 1 --> Bug fixes" },
+  { message = "^refactor", group = "<!-- 2 --> Refactor" },
+  { message = "^doc.*update changelog", skip = true },
+  { message = "^doc", group = "<!-- 3 --> Documentation" },
+  { message = "^perf", group = "<!-- 4 --> Performance" },
+  { message = "^style", group = "<!-- 5 --> Styling" },
+  { message = "^test", group = "<!-- 6 --> Testing" },
+  { message = "^chore: bump version", skip = true },
+  { message = "^chore|^ci", group = "<!-- 7 --> Miscellaneous" },
+  { message = "^revert", group = "<!-- 8 --> Reverts" },
+  { message = ".*", skip = true },
+]
+filter_commits = false
+protect_breaking_commits = false
+topo_order = false
+topo_order_commits = true
+use_branch_tags = false
+
+[bump]
+breaking_always_bump_major = false
+features_always_bump_minor = true
+initial_tag = "0.1.0"
