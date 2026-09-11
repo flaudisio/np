@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.0 - 2026-09-11
+
 ### Features
 
 - Add --version flag with ldflags injection
