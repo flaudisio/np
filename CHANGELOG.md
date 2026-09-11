@@ -4,6 +4,7 @@
 
 ### Features
 
+- Add --version flag with ldflags injection
 - Add 'reg' alias to registry command
 - Add registry add/delete/update CLI subcommands
 - Add registry add/delete/update functions to nomadpack
@@ -44,6 +45,8 @@
 
 ### Miscellaneous
 
+- [release] Add git-cliff and bump-my-version setup
+- [gitignore] Align with toptal scaffold template
 - [deps] Configure dependabot for go and actions
 - [.github] Update pre-commit workflow
 - Add release pipeline with goreleaser
