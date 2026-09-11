@@ -1,13 +1,37 @@
 [tools]
+git-cliff = "2"
 go = "1.26"
 golangci-lint = "2.12"
-nomad-pack = "0.4"
-shellcheck = "0.11"
 nomad = "2"
+nomad-pack = "0.4"
+"pipx:bump-my-version" = "1"
+shellcheck = "0.11"
 
 [tasks.pre-commit]
 description = "Run pre-commit"
 run = "pre-commit run --all-files --color always"
+
+[tasks."bump-version"]
+description = "Bump the project version"
+run = "bump-my-version bump --new-version $( git-cliff --bump --bumped-version --output - )"
+
+[tasks.git-push]
+description = "Push the current branch and related tags"
+run = "git push --follow-tags origin HEAD"
+
+[tasks.update-changelog]
+description = "Update the project changelog"
+run = """
+  #!/usr/bin/env bash
+  set -eo pipefail
+
+  git-cliff --output CHANGELOG.md
+
+  if [[ "$1" == "--commit" ]] ; then
+    git add -- CHANGELOG.md
+    [[ -n "$( git diff --staged -- CHANGELOG.md )" ]] && git commit -m "docs: update changelog" || true
+  fi
+"""
 
 [tasks.lint]
 description = "Run golangci-lint"
