@@ -2,6 +2,7 @@ package nomadpack
 
 import (
 	"os/exec"
+	"strings"
 	"testing"
 
 	"github.com/flaudisio/np/internal/config"
@@ -625,6 +626,173 @@ func TestRegistryUpdateExecFailure(t *testing.T) {
 
 	err := RegistryUpdate(cfg, false)
 	if err == nil {
+		t.Fatal("expected error from exec failure")
+	}
+}
+
+func TestJobNameVarWins(t *testing.T) {
+	cfg := &config.DeployConfig{
+		Deploy: config.DeploySection{
+			Name: "from-deploy",
+			Vars: map[string]string{"job_name": "from-var"},
+		},
+	}
+
+	name, err := jobName(cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if name != "from-var" {
+		t.Errorf("expected from-var, got %s", name)
+	}
+}
+
+func TestJobNameFallbackToDeployName(t *testing.T) {
+	cfg := &config.DeployConfig{
+		Deploy: config.DeploySection{
+			Name: "from-deploy",
+			Vars: map[string]string{"other": "value"},
+		},
+	}
+
+	name, err := jobName(cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if name != "from-deploy" {
+		t.Errorf("expected from-deploy, got %s", name)
+	}
+}
+
+func TestJobNameMissing(t *testing.T) {
+	cfg := &config.DeployConfig{
+		Deploy: config.DeploySection{
+			Vars: map[string]string{"job_name": ""},
+		},
+	}
+
+	_, err := jobName(cfg)
+	if err == nil {
+		t.Fatal("expected error when no job name can be determined")
+	}
+	if !strings.Contains(err.Error(), "cannot determine job name") {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestStatus(t *testing.T) {
+	calls := [][]string{}
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		calls = append(calls, append([]string{name}, args...))
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Deploy: config.DeploySection{Name: "my-job"},
+		Pack:   config.PackConfig{Name: "my-pack"},
+	}
+
+	if err := Status(cfg, false); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expected := []string{"nomad", "job", "status", "my-job"}
+	assertSliceEqual(t, expected, calls[0])
+}
+
+func TestStatusWithJobNameVar(t *testing.T) {
+	calls := [][]string{}
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		calls = append(calls, append([]string{name}, args...))
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Deploy: config.DeploySection{
+			Name: "my-job",
+			Vars: map[string]string{"job_name": "var-job"},
+		},
+	}
+
+	if err := Status(cfg, false); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expected := []string{"nomad", "job", "status", "var-job"}
+	assertSliceEqual(t, expected, calls[0])
+}
+
+func TestStatusWithExtraArgs(t *testing.T) {
+	calls := [][]string{}
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		calls = append(calls, append([]string{name}, args...))
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Deploy: config.DeploySection{Name: "my-job"},
+	}
+
+	if err := Status(cfg, false, "-json"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expected := []string{"nomad", "job", "status", "my-job", "-json"}
+	assertSliceEqual(t, expected, calls[0])
+}
+
+func TestStatusDryRun(t *testing.T) {
+	callCount := 0
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		callCount++
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Deploy: config.DeploySection{Name: "my-job"},
+	}
+
+	if err := Status(cfg, true); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if callCount != 0 {
+		t.Errorf("expected 0 exec calls, got %d", callCount)
+	}
+}
+
+func TestStatusMissingJobName(t *testing.T) {
+	callCount := 0
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		callCount++
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Pack: config.PackConfig{Name: "my-pack"},
+	}
+
+	err := Status(cfg, false)
+	if err == nil {
+		t.Fatal("expected error for missing job name")
+	}
+	if callCount != 0 {
+		t.Errorf("expected 0 exec calls, got %d", callCount)
+	}
+}
+
+func TestStatusExecFailure(t *testing.T) {
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		return exec.Command("false")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	cfg := &config.DeployConfig{
+		Deploy: config.DeploySection{Name: "my-job"},
+	}
+
+	if err := Status(cfg, false); err == nil {
 		t.Fatal("expected error from exec failure")
 	}
 }
