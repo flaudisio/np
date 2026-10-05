@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.0 - 2026-10-04
+
 ### Features
 
 - Add status command
