@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Features
+
+- Add status command
+
 ## v0.1.0 - 2026-09-11
 
 ### Features
@@ -24,6 +28,7 @@
 
 ### Bug fixes
 
+- [release] Build from cmd/np main package
 - Add field validation and exec failure tests for registry commands
 - Treat nomad-pack run exit code 2 as non-error
 - Treat nomad-pack plan exit code 1 as non-error
