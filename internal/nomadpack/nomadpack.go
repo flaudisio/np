@@ -1,4 +1,4 @@
-// Package nomadpack builds and executes nomad-pack CLI commands.
+// Package nomadpack builds and executes Nomad and nomad-pack CLI commands.
 package nomadpack
 
 import (
@@ -94,6 +94,40 @@ func Run(cfg *config.DeployConfig, action string, dryRun bool, extraArgs ...stri
 		return err
 	}
 	return nil
+}
+
+// jobName resolves the Nomad job name from the config. The "job_name" var
+// takes precedence over deploy.name. It returns an error when neither is set.
+func jobName(cfg *config.DeployConfig) (string, error) {
+	if v := cfg.Deploy.Vars["job_name"]; v != "" {
+		return v, nil
+	}
+	if cfg.Deploy.Name != "" {
+		return cfg.Deploy.Name, nil
+	}
+	return "", errors.New("cannot determine job name: set deploy.vars.job_name or deploy.name")
+}
+
+// Status runs "nomad job status" for the job resolved from the config.
+// If dryRun is true, only the command is logged and nil is returned.
+func Status(cfg *config.DeployConfig, dryRun bool, extraArgs ...string) error {
+	name, err := jobName(cfg)
+	if err != nil {
+		return err
+	}
+
+	cmd := []string{"nomad", "job", "status", name}
+	cmd = append(cmd, extraArgs...)
+	log.Info("+ " + strings.Join(cmd, " "))
+
+	if dryRun {
+		return nil
+	}
+
+	c := execCommand(cmd[0], cmd[1:]...)
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	return c.Run()
 }
 
 // RegistryAdd runs nomad-pack registry add using the configured registry.

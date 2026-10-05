@@ -59,6 +59,7 @@ plan:
 | `np destroy`               | Destroy the deployment            |
 | `np stop`                  | Stop the deployment               |
 | `np render`                | Render the pack                   |
+| `np status`                | Show Nomad job status             |
 | `np registry add`          | Add the configured registry       |
 | `np registry delete`       | Delete the configured registry    |
 | `np registry update`       | Update the configured registry    |

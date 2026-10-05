@@ -42,6 +42,7 @@ func main() {
 	rootCmd.AddCommand(destroyCmd())
 	rootCmd.AddCommand(stopCmd())
 	rootCmd.AddCommand(renderCmd())
+	rootCmd.AddCommand(statusCmd())
 	rootCmd.AddCommand(registryCmd())
 
 	if err := rootCmd.Execute(); err != nil {
@@ -101,6 +102,17 @@ func renderCmd() *cobra.Command {
 		Short: "Render a Nomad Pack from deploy.yml",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return run("render", args)
+		},
+	}
+}
+
+// statusCmd returns the "status" subcommand.
+func statusCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "status",
+		Short: "Show Nomad job status for the deployment in deploy.yml",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runStatus(args)
 		},
 	}
 }
@@ -181,5 +193,26 @@ func run(action string, extraArgs []string) error {
 	}
 
 	log.Info(action + " complete")
+	return nil
+}
+
+// runStatus loads the config, then runs "nomad job status" for the resolved job.
+func runStatus(extraArgs []string) error {
+	cfg, err := config.Load(configPath)
+	if err != nil {
+		return err
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("getting working directory: %w", err)
+	}
+	log.Info("Running from " + cwd)
+
+	if err := nomadpack.Status(cfg, dryRun, extraArgs...); err != nil {
+		return err
+	}
+
+	log.Info("status complete")
 	return nil
 }

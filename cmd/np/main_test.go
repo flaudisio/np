@@ -235,6 +235,77 @@ pack:
 	}
 }
 
+func TestCLIStatusDryRun(t *testing.T) {
+	if os.Getenv("TEST_CLI") == "1" {
+		dir := os.Getenv("TEST_DIR")
+		if err := os.Chdir(dir); err != nil {
+			t.Fatal(err)
+		}
+		os.Args = []string{"np", "status", "--dry-run"}
+		main()
+		return
+	}
+
+	dir := t.TempDir()
+	yaml := `
+pack:
+  name: test-pack
+deploy:
+  name: test-deploy
+`
+	if err := os.WriteFile(filepath.Join(dir, "deploy.yml"), []byte(yaml), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cmd := exec.Command(os.Args[0], "-test.run=TestCLIStatusDryRun")
+	cmd.Env = append(os.Environ(), "TEST_CLI=1", "TEST_DIR="+dir)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("unexpected error: %v\n%s", err, out)
+	}
+	if !strings.Contains(string(out), "nomad job status test-deploy") {
+		t.Errorf("expected nomad job status command in output, got: %s", out)
+	}
+	if !strings.Contains(string(out), "status complete") {
+		t.Errorf("expected status complete message, got: %s", out)
+	}
+}
+
+func TestCLIStatusJobNameVar(t *testing.T) {
+	if os.Getenv("TEST_CLI") == "1" {
+		dir := os.Getenv("TEST_DIR")
+		if err := os.Chdir(dir); err != nil {
+			t.Fatal(err)
+		}
+		os.Args = []string{"np", "status", "--dry-run"}
+		main()
+		return
+	}
+
+	dir := t.TempDir()
+	yaml := `
+pack:
+  name: test-pack
+deploy:
+  name: test-deploy
+  vars:
+    job_name: var-job
+`
+	if err := os.WriteFile(filepath.Join(dir, "deploy.yml"), []byte(yaml), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	cmd := exec.Command(os.Args[0], "-test.run=TestCLIStatusJobNameVar")
+	cmd.Env = append(os.Environ(), "TEST_CLI=1", "TEST_DIR="+dir)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("unexpected error: %v\n%s", err, out)
+	}
+	if !strings.Contains(string(out), "nomad job status var-job") {
+		t.Errorf("expected job_name var to win, got: %s", out)
+	}
+}
+
 func TestCLIRegistryAddDryRun(t *testing.T) {
 	if os.Getenv("TEST_CLI") == "1" {
 		dir := os.Getenv("TEST_DIR")
