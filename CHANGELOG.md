@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Bug fixes
+
+- [ci] Use pinned golangci-lint in pre-commit
+- Match registry ref in ensureRegistry
+
+### Documentation
+
+- Expand AGENTS.md with testing and release context
+
+### Miscellaneous
+
+- [deps] Bump jdx/mise-action from 4 to 5
+
 ## v0.2.0 - 2026-10-04
 
 ### Features
