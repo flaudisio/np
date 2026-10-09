@@ -166,7 +166,7 @@ func TestEnsureRegistryAlreadyExists(t *testing.T) {
 	execCommand = func(name string, args ...string) *exec.Cmd {
 		calls = append(calls, append([]string{name}, args...))
 		if name == "nomad-pack" && len(args) >= 2 && args[0] == "registry" && args[1] == "list" {
-			return exec.Command("echo", "REGISTRY NAME  SOURCE\nmy-registry  https://example.com\nother-reg  https://other.com\n")
+			return exec.Command("echo", "REGISTRY NAME | REF | LOCAL REF | REGISTRY URL\nmy-registry | main | abc123 | https://example.com\nother-reg | latest | def456 | https://other.com\n")
 		}
 		return exec.Command("echo", "fake")
 	}
@@ -182,12 +182,57 @@ func TestEnsureRegistryAlreadyExists(t *testing.T) {
 	}
 }
 
+func TestEnsureRegistryDifferentRef(t *testing.T) {
+	calls := [][]string{}
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		calls = append(calls, append([]string{name}, args...))
+		if name == "nomad-pack" && len(args) >= 2 && args[0] == "registry" && args[1] == "list" {
+			return exec.Command("echo", "REGISTRY NAME | REF | LOCAL REF | REGISTRY URL\nmy-registry | old | abc123 | https://example.com\n")
+		}
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	reg := &config.RegistryConfig{Name: "my-registry", Source: "https://example.com", Ref: "main"}
+	err := ensureRegistry(reg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(calls) < 2 {
+		t.Fatalf("expected list + add calls (same name, new ref), got %d: %v", len(calls), calls)
+	}
+	if calls[1][2] != "add" || calls[1][5] != "--ref" || calls[1][6] != "main" {
+		t.Errorf("expected add with --ref main, got: %v", calls[1])
+	}
+}
+
+func TestEnsureRegistryDefaultRef(t *testing.T) {
+	calls := [][]string{}
+	execCommand = func(name string, args ...string) *exec.Cmd {
+		calls = append(calls, append([]string{name}, args...))
+		if name == "nomad-pack" && len(args) >= 2 && args[0] == "registry" && args[1] == "list" {
+			return exec.Command("echo", "REGISTRY NAME | REF | LOCAL REF | REGISTRY URL\nmy-registry | latest | abc123 | https://example.com\n")
+		}
+		return exec.Command("echo", "fake")
+	}
+	defer func() { execCommand = exec.Command }()
+
+	reg := &config.RegistryConfig{Name: "my-registry", Source: "https://example.com"}
+	err := ensureRegistry(reg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(calls) != 1 || calls[0][2] != "list" {
+		t.Errorf("expected only list call (empty ref matches latest), got: %v", calls)
+	}
+}
+
 func TestEnsureRegistryNotExists(t *testing.T) {
 	calls := [][]string{}
 	execCommand = func(name string, args ...string) *exec.Cmd {
 		calls = append(calls, append([]string{name}, args...))
 		if name == "nomad-pack" && len(args) >= 2 && args[0] == "registry" && args[1] == "list" {
-			return exec.Command("echo", "REGISTRY NAME  SOURCE\nother-reg  https://other.com\n")
+			return exec.Command("echo", "REGISTRY NAME | REF | LOCAL REF | REGISTRY URL\nother-reg | latest | def456 | https://other.com\n")
 		}
 		return exec.Command("echo", "fake")
 	}
@@ -214,7 +259,7 @@ func TestEnsureRegistryNoFalsePositive(t *testing.T) {
 	execCommand = func(name string, args ...string) *exec.Cmd {
 		calls = append(calls, append([]string{name}, args...))
 		if name == "nomad-pack" && len(args) >= 2 && args[0] == "registry" && args[1] == "list" {
-			return exec.Command("echo", "REGISTRY NAME  SOURCE\ncorpsec  https://example.com\n")
+			return exec.Command("echo", "REGISTRY NAME | REF | LOCAL REF | REGISTRY URL\ncorpsec | latest | abc123 | https://example.com\n")
 		}
 		return exec.Command("echo", "fake")
 	}
@@ -235,7 +280,7 @@ func TestRunWithoutDryRun(t *testing.T) {
 	execCommand = func(name string, args ...string) *exec.Cmd {
 		calls = append(calls, append([]string{name}, args...))
 		if name == "nomad-pack" && len(args) >= 2 && args[0] == "registry" && args[1] == "list" {
-			return exec.Command("echo", "REGISTRY NAME  SOURCE\nmy-registry  https://example.com\n")
+			return exec.Command("echo", "REGISTRY NAME | REF | LOCAL REF | REGISTRY URL\nmy-registry | main | abc123 | https://example.com\n")
 		}
 		return exec.Command("echo", "fake")
 	}

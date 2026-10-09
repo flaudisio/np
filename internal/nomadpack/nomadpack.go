@@ -208,16 +208,25 @@ func SetExecCommand(fn func(name string, args ...string) *exec.Cmd) func(name st
 }
 
 // ensureRegistry lists existing registries and adds the configured one
-// if it is not already present.
+// if the same name and ref are not already present. nomad-pack defaults
+// an empty ref to "latest", so that is the ref compared against.
 func ensureRegistry(reg *config.RegistryConfig) error {
 	out, err := execCommand("nomad-pack", "registry", "list").Output()
 	if err != nil {
 		return fmt.Errorf("listing registries: %w", err)
 	}
 
+	ref := reg.Ref
+	if ref == "" {
+		ref = "latest"
+	}
+
 	for _, line := range strings.Split(string(out), "\n") {
-		fields := strings.Fields(line)
-		if len(fields) > 0 && fields[0] == reg.Name {
+		cols := strings.Split(line, "|")
+		if len(cols) < 2 {
+			continue
+		}
+		if strings.TrimSpace(cols[0]) == reg.Name && strings.TrimSpace(cols[1]) == ref {
 			return nil
 		}
 	}
