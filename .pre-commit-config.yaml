@@ -17,10 +17,15 @@ repos:
     hooks:
       - id: yamllint
         entry: yamllint --strict
-  - repo: https://github.com/golangci/golangci-lint
-    rev: v2.13.2
+  - repo: local
     hooks:
       - id: golangci-lint-full
+        name: golangci-lint-full
+        entry: golangci-lint run --fix
+        language: system
+        types: [go]
+        pass_filenames: false
+        require_serial: true
   - repo: https://github.com/gruntwork-io/pre-commit
     rev: v0.1.30
     hooks:
