@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.1 - 2026-10-09
+
 ### Bug fixes
 
 - [ci] Use pinned golangci-lint in pre-commit
