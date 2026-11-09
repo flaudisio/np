@@ -4,7 +4,7 @@ Go CLI that turns a YAML config (`deploy.yml`) into `nomad-pack` / `nomad` comma
 
 ## Stack
 
-- Go 1.26, managed via [mise](https://mise.jdx.dev/)
+- Go 1.27, managed via [mise](https://mise.jdx.dev/)
 - CLI: [Cobra](https://github.com/spf13/cobra); Config: [Viper](https://github.com/spf13/viper)
 - Lint: golangci-lint + prek (yamllint `--strict`, shellcheck)
 

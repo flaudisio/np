@@ -1,7 +1,7 @@
 [tools]
 git-cliff = "2"
-go = "1.26"
-golangci-lint = "2.12"
+go = "1.27"
+golangci-lint = "2.15"
 nomad = "2"
 nomad-pack = "0.4"
 "pipx:bump-my-version" = "1"
