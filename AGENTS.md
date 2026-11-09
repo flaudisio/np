@@ -6,14 +6,15 @@ Go CLI that turns a YAML config (`deploy.yml`) into `nomad-pack` / `nomad` comma
 
 - Go 1.26, managed via [mise](https://mise.jdx.dev/)
 - CLI: [Cobra](https://github.com/spf13/cobra); Config: [Viper](https://github.com/spf13/viper)
-- Lint: golangci-lint + pre-commit (yamllint `--strict`, shellcheck)
+- Lint: golangci-lint + prek (yamllint `--strict`, shellcheck)
 
 ## Setup / common commands
 
 ```bash
 mise install        # go, golangci-lint, nomad, nomad-pack, git-cliff, shellcheck, ...
 mise run test       # go test ./...   (alias: t)
-mise run lint       # pre-commit --all-files + golangci-lint-full   (alias: l)
+mise run lint       # prek --all-files (all hooks)   (alias: l)
+mise run lint:golangci  # golangci-lint only
 mise run build      # go build -o np ./cmd/np, version injected via ldflags   (alias: b)
 ```
 
