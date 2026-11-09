@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.3.0 - 2026-11-09
+
 ### Miscellaneous
 
 - Run tests before release
