@@ -5,11 +5,17 @@ golangci-lint = "2.12"
 nomad = "2"
 nomad-pack = "0.4"
 "pipx:bump-my-version" = "1"
+prek = "latest"
 shellcheck = "0.11"
 
-[tasks.pre-commit]
-description = "Run pre-commit"
-run = "pre-commit run --all-files --color always"
+[tasks.lint]
+description = "Run lint"
+alias = "l"
+run = "prek run --all-files --color always"
+
+[tasks."lint:golangci"]
+description = "Run golangci-lint"
+run = "prek run --all-files --color always golangci-lint-full"
 
 [tasks."bump-version"]
 description = "Bump the project version"
@@ -32,11 +38,6 @@ run = """
     [[ -n "$( git diff --staged -- CHANGELOG.md )" ]] && git commit -m "docs: update changelog" || true
   fi
 """
-
-[tasks.lint]
-description = "Run golangci-lint"
-alias = "l"
-run = "mise run pre-commit golangci-lint-full"
 
 [tasks.build]
 description = "Build the project"
