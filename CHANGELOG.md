@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Miscellaneous
+
+- Run tests before release
+- Run tests on GitHub Actions
+- Bump Go to 1.27
+- [pre-commit] Use frozen refs
+- Migrate pre-commit to prek
+
 ## v0.2.1 - 2026-10-09
 
 ### Bug fixes
